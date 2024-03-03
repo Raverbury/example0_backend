@@ -52,12 +52,14 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        $user = User::where('email', $credentials['email'])->first();
-
-        if ($user == null || !Hash::check($credentials['password'], $user['password']))
+        if (!Auth::attempt($credentials))
         {
             return response('Invalid credentials');
         }
+        print($request->user());
+
+        $user = Auth::user();
+        print($user);
 
         $user->tokens()->delete();
         $token = $user->createToken('test');
