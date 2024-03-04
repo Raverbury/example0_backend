@@ -1,0 +1,88 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"Indicates what fields are available at the top level of a query operation."
+type Query {
+    "Find a single user by an identifying attribute."
+    user(
+      "Search by primary key."
+      id: ID @eq @rules(apply: ["prohibits:email", "required_without:email"])
+
+      "Search by email address."
+      email: String @eq @rules(apply: ["prohibits:id", "required_without:id", "email"])
+    ): User @find
+
+    "List multiple users."
+    users(
+      "Finds by exact id."
+      id: ID @eq
+      "Filters by name. Accepts SQL LIKE wildcards `%` and `_`."
+      name: String @where(operator: "like")
+    ): [User!]! @paginate(defaultCount: 10)
+
+    todo(id: ID! @eq): Todo @find
+
+    "Find the currently authenticated user, provided that bearer token is included in Authorization header."
+    me: User @auth
+
+    "Get all public todos."
+    public_todos: [Todo!]! @all @eq(key: "is_public", value: 1)
+}
+
+type Mutation {
+    "Register a new user."
+    createUser(email: String!, name: String!, password: String!): User!
+    "Log in."
+    logIn(email: String!, password: String!): LogInResult!
+    "Log out."
+    logOut: Int @guard
+    "Create a todo belonging to the currently authenticated user."
+    createTodo(todo_title: String!, todo_text: String!, is_public: Boolean!): Todo @guard @create @inject(context: "user.id", name: "user_id")
+    updateTodo(id: ID!, todo_title: String, todo_text: String, is_public: Boolean): Todo @guard @canFind(ability: "update", find: "id") @update
+}
+
+"Account of a person who utilizes this application."
+type User {
+    "Unique primary key."
+    id: ID!
+
+    "Non-unique name."
+    name: String!
+
+    "Unique email address."
+    email: String!
+
+    "When the email was verified."
+    email_verified_at: DateTime
+
+    "When the account was created."
+    created_at: DateTime!
+
+    "When the account was last updated."
+    updated_at: DateTime!
+
+    "All todos belonging to this user."
+    todos: [Todo!]! @hasMany @guard
+}
+
+"Todo"
+type Todo {
+  "Unique primary key."
+  id: ID!
+
+  "Non-unique title."
+  todo_title: String!
+
+  "Todo body text."
+  todo_text: String!
+
+  "The user who owns this todo."
+  user: User! @belongsTo
+}
+
+
+type LogInResult {
+  user: User!
+  token: String!
+  query: Query!
+}
