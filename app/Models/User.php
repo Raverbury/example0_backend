@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -80,8 +81,8 @@ class User extends Authenticatable
             $credentials,
             [
                 'email' => 'required|email|unique:users|max:256',
-                'name' => 'required|max:256',
-                'password' => 'required|max:256'
+                'name' => 'required|max:256|alpha_num:ascii',
+                'password' => ['required', 'max:256', Password::min(8)->letters()->mixedCase()->numbers()->symbols()]
             ]
         );
 
