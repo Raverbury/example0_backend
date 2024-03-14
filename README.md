@@ -1,3 +1,23 @@
+## Setup
+
+- Clone this repo
+- Install php, my php version is 8.3.1 if you want to replicate the exact setup
+- Install composer
+- Prepare a MySQL database together with a user with all privileges on it
+- Copy .env.example into .env and make changes where needed, especially the database parts
+- Run these commands
+```sh
+composer install
+php artisan key:generate
+php artisan migrate
+```
+- And you are set, now run this command to start the Laravel development server, or plug this into a running webserver's directory and pray it doesn't explode
+```sh
+php artisan serve
+```
+
+* I might be missing a few steps, feel free to open an issue
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
