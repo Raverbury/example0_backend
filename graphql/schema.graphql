@@ -20,13 +20,13 @@ type Query {
       name: String @where(operator: "like")
     ): [User!]! @paginate(defaultCount: 10)
 
-    todo(id: ID! @eq): Todo @find
+    todo(id: ID! @eq): Todo @canFind(ability: "view", find:"id") @find
 
     "Find the currently authenticated user, provided that bearer token is included in Authorization header."
     me: User @auth
 
     "Get all public todos."
-    public_todos: [Todo!]! @all @eq(key: "is_public", value: 1)
+    public_todos: [Todo!]! @eq(key: "is_public", value: 1) @paginate(defaultCount: 10)
 }
 
 type Mutation {
@@ -78,6 +78,9 @@ type Todo {
 
   "The user who owns this todo."
   user: User! @belongsTo
+
+  "Whether this todo is viewable by the public"
+  is_public: Boolean!
 }
 
 
